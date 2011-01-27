@@ -1,0 +1,24 @@
+<application>
+
+<name>appScoper</name>
+<author>Bob Chesley</author>
+<version>1.0</version>
+<email>bob.chesley@nhsoftwerks.com</email>	
+<description>Does code line counts by extension for a project.</description>	
+<license>license.html</license>
+
+	
+<menucontributions>
+	<contribution target="projectview">
+		<menu name="appScoper">
+			<action name="Run..." handlerid="default" showresponse="true"></action>
+		</menu>
+	</contribution>
+</menucontributions>
+	
+	<handlers>
+		<handler id="default" type="cfm" filename="index.cfm" />
+	</handlers>
+
+</application>
+

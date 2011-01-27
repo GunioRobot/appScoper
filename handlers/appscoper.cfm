@@ -11,6 +11,7 @@
 	<cfset fileList = [ url.path ]>
 </cfif>
 <cfset grandTotalLines = 0>
+<cfset grandTotalFiles = 0>
 
 <!--- set up results array by extension --->
 <cfset extCount = ArrayLen(request.includedExtensions)>
@@ -18,7 +19,8 @@
 <cfset temp = ArrayResize(resultsArray, extCount)>
 <cfloop index="i" from="1" to="#extCount#">
 	<cfset resultsArray[i][1] = request.includedExtensions[i]>
-	<cfset resultsArray[i][2] = 0>
+	<cfset resultsArray[i][2] = 0>   <!--- line count --->
+	<cfset resultsArray[i][3] = 0>   <!--- file count --->
 </cfloop>
 <cfloop array="#fileList#" index="filePath">
 	<!--- check for excluded paths and skip --->
@@ -36,14 +38,17 @@
 		<cfset curExt = listLast (filePath, ".")>
 		<cfset curExtIndex = ArrayFind(request.includedExtensions, #curExt#)>
 		<cfset lineCount = 0>
-		<cfset fileIssues = "">
 		<cfloop file="#filePath#" index="line">
 			<!--- get line count for this file --->
 			<cfset lineCount++>
 		</cfloop>
 		<!--- increment grand total and extension total in array --->
 		<cfset grandTotalLines = grandTotalLines + lineCount>
+		<cfset grandTotalFiles = grandTotalFiles + 1>
+		<!--- increment line count for current extension --->
 		<cfset resultsArray[#curExtIndex#][2] = resultsArray[#curExtIndex#][2] + lineCount>
+		<!--- increment file count for current extension --->
+		<cfset resultsArray[#curExtIndex#][3] = resultsArray[#curExtIndex#][3] + 1>
 	</cfif>
 </cfloop>
 
@@ -75,35 +80,47 @@ td {
 td.count {
 	text-align: right;
 }
+tr.totals {
+	font-weight: 700;
+}
 </style>
 <body>
 </cfoutput>
 <cfoutput>
+<!--- TBD - just output saved content rather than running again --->
 <table>
-	<tr><th colspan="2">Results: #url.path#</th></tr>
+	<tr><th colspan="4">Results: #url.path#</th></tr>
+	<tr><th>Extension</th><th>Lines</th><th>Files</th><th>Avg Lines/File</th></tr>
 	<cfloop index="i" from="1" to="#extCount#">
-		<tr><td>Lines in extension #resultsArray[i][1]#</td><td class="count">#resultsArray[i][2]#</td></tr>
+		<tr><td>Lines in extension #resultsArray[i][1]#</td><td class="count">#resultsArray[i][2]#</td><td class="count">#resultsArray[i][3]#</td><td class="count">#round(resultsArray[i][2]/max(resultsArray[i][3],1))#</td></tr>
 	</cfloop>
-	<tr><td>Total lines</td><td class="count">#grandTotalLines#</td></tr>
+	<tr class="totals"><td class="count">Totals</td><td class="count">#grandTotalLines#</td><td class="count">#grandTotalFiles#</td><td class="count">#round(grandTotalLines/grandTotalFiles)#</td></tr>
 </table>
-<cfsavecontent variable="report">
-<table>
-	<tr><th colspan="2">Results: #url.path#</th></tr>
-	<cfloop index="i" from="1" to="#extCount#">
-		<tr><td>Lines in extension #resultsArray[i][1]#</td><td class="count">#resultsArray[i][2]#</td></tr>
-	</cfloop>
-	<tr><td>Total lines</td><td class="count">#grandTotalLines#</td></tr>
-</table>
-</cfsavecontent>
-<cfset xlsFile = "#url.path#/appscoper_#DateFormat(Now(),'ddmmyyyy')#_#LSTimeFormat(Now(),'HHMMSS')#.xls">
-<cffile action="write" file="#xlsFile#" output="#report#">
-<br />
-XLS output saved to:<br />
-#xlsFile#<br /><br />
-<cfif isDefined("variables.localConfig")>
-Using project local config.
+<cfif request.makeXls>
+	<cfsavecontent variable="report">
+	<table>
+		<tr><th colspan="4">Results: #url.path#</th></tr>
+		<tr><th colspan="4">Results: #url.path#</th></tr>
+		<cfloop index="i" from="1" to="#extCount#">
+			<tr><td>Lines in extension #resultsArray[i][1]#</td><td class="count">#resultsArray[i][2]#</td></tr>
+		</cfloop>
+		<tr><td>Total lines</td><td class="count">#grandTotalLines#</td></tr>
+	</table>
+	</cfsavecontent>
+	<cfset xlsFile = "#url.path#/appscoper_#DateFormat(Now(),'ddmmyyyy')#_#LSTimeFormat(Now(),'HHMMSS')#.xls">
+	<cffile action="write" file="#xlsFile#" output="#report#">
+	<br />
+	XLS output saved to:<br />
+	#xlsFile#<br />
 <cfelse>
-Using global config.
+	<br />
+	XLS output disabled
+</cfif>
+<br />
+<cfif isDefined("variables.localConfig")>
+Using project local config
+<cfelse>
+Using global config
 </cfif>
 </body>
 </cfoutput>

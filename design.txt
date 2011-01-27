@@ -1,3 +1,0 @@
-Pending Tasks:
-1 - add code to exclude some user specified paths
-2 - add code to look for directory/project local config file for exclusions and inclusions and override defaults

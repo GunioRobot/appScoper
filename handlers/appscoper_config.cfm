@@ -3,4 +3,6 @@
 request.includedExtensions = ["cfc","cfm","css","js","html"];
 // request.exclude is an array of partial paths or subdirecctories to exclude when counting lines
 request.excludePaths = ["assets","deploy","design","extDirectApi","mxunit","org","schema","selenium","tests","install"];
+// enable to create XLS file when run
+request.makeXls = false;
 </cfscript>

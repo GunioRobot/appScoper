@@ -88,6 +88,7 @@ tr.totals {
 </cfoutput>
 <cfoutput>
 <!--- TBD - just output saved content rather than running again --->
+<cfsavecontent variable="report">
 <table>
 	<tr><th colspan="4">Results: #url.path#</th></tr>
 	<tr><th>Extension</th><th>Lines</th><th>Files</th><th>Avg Lines/File</th></tr>
@@ -96,17 +97,10 @@ tr.totals {
 	</cfloop>
 	<tr class="totals"><td class="count">Totals</td><td class="count">#grandTotalLines#</td><td class="count">#grandTotalFiles#</td><td class="count">#round(grandTotalLines/grandTotalFiles)#</td></tr>
 </table>
+</cfsavecontent>
+<!--- output results to page --->
+#report#
 <cfif request.makeXls>
-	<cfsavecontent variable="report">
-	<table>
-		<tr><th colspan="4">Results: #url.path#</th></tr>
-		<tr><th colspan="4">Results: #url.path#</th></tr>
-		<cfloop index="i" from="1" to="#extCount#">
-			<tr><td>Lines in extension #resultsArray[i][1]#</td><td class="count">#resultsArray[i][2]#</td></tr>
-		</cfloop>
-		<tr><td>Total lines</td><td class="count">#grandTotalLines#</td></tr>
-	</table>
-	</cfsavecontent>
 	<cfset xlsFile = "#url.path#/appscoper_#DateFormat(Now(),'ddmmyyyy')#_#LSTimeFormat(Now(),'HHMMSS')#.xls">
 	<cffile action="write" file="#xlsFile#" output="#report#">
 	<br />

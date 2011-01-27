@@ -1,7 +1,7 @@
 ﻿<cfinclude template="utils.cfm">
 <cfif directoryExists ( url.path )>
   <cfset fileList = directoryList ( url.path, true, "path", "*.*" )>
-  <!--- if project local config exists load it TBD - not sure if ending backslash is already there or not --->
+  <!--- if project local config exists load it --->
   <cfset relPath = #getRelative(url.path)#>
   <cfif fileExists(url.path & "/appscoper_config.cfm")>
     <cfset localConfig = relPath & "/appscoper_config.cfm">
@@ -87,7 +87,6 @@ tr.totals {
 <body>
 </cfoutput>
 <cfoutput>
-<!--- TBD - just output saved content rather than running again --->
 <cfsavecontent variable="report">
 <table>
   <tr>
